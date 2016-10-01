@@ -2,12 +2,9 @@ package events
 
 import (
 	"crypto/rand"
-	"time"
-
-	"github.com/FoundationDB/fdb-go/fdb"
-	"github.com/FoundationDB/fdb-go/fdb/subspace"
-	"github.com/FoundationDB/fdb-go/fdb/tuple"
-	"github.com/happypancake/hpc/fsd"
+	"github.com/abdullin/fdb-go/fdb"
+	"github.com/abdullin/fdb-go/fdb/subspace"
+	"github.com/abdullin/fdb-go/fdb/tuple"
 )
 
 type fdbStore struct {
@@ -46,9 +43,9 @@ func nextRandom() []byte {
 
 // ReportMetrics enables FSD metrics reporting. It is disabled by default
 // to avoid polluting unit tests
-func (es *fdbStore) ReportMetrics() {
-	es.reportMetrics = true
-}
+//func (es *fdbStore) ReportMetrics() {
+//	es.reportMetrics = true
+//}
 
 func (es *fdbStore) Clear() {
 	es.db.Transact(func(tr fdb.Transaction) (interface{}, error) {
@@ -58,9 +55,6 @@ func (es *fdbStore) Clear() {
 }
 
 func (es *fdbStore) Append(records []Envelope) (err error) {
-	if es.reportMetrics {
-		defer fsd.TimeSince("es.append", time.Now())
-	}
 
 	globalSpace := es.space.Sub(globalPrefix)
 
@@ -77,22 +71,10 @@ func (es *fdbStore) Append(records []Envelope) (err error) {
 		return nil, nil
 	})
 
-	if es.reportMetrics {
-		if nil == err {
-			fsd.Count("es.append.ok", 1)
-		} else {
-			fsd.Count("es.append.fail", 1)
-		}
-	}
-
 	return
 }
 
 func (es *fdbStore) AppendToAggregate(aggregId string, expectedVersion int, records []Envelope) (err error) {
-
-	if es.reportMetrics {
-		defer fsd.TimeSince("es.append", time.Now())
-	}
 
 	globalSpace := es.space.Sub(globalPrefix)
 	aggregSpace := es.space.Sub(aggregPrefix, aggregId)
@@ -140,14 +122,6 @@ func (es *fdbStore) AppendToAggregate(aggregId string, expectedVersion int, reco
 
 		return nil, nil
 	})
-
-	if es.reportMetrics {
-		if nil == err {
-			fsd.Count("es.append.ok", 1)
-		} else {
-			fsd.Count("es.append.fail", 1)
-		}
-	}
 
 	return
 }

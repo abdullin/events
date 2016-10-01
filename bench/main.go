@@ -6,7 +6,7 @@ import (
 	"runtime"
 
 	stdlog "log"
-	"github.com/FoundationDB/fdb-go/fdb"
+	"github.com/abdullin/fdb-go/fdb"
 	"github.com/op/go-logging"
 )
 
@@ -36,7 +36,7 @@ func main() {
 
 	procs := runtime.GOMAXPROCS(runtime.NumCPU())
 
-	log.Info("Set GOMAXPROCS to %v", procs)
+	log.Infof("Set GOMAXPROCS to %v", procs)
 
 	commands := flag.Args()
 	if len(commands) == 0 {

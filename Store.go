@@ -6,7 +6,6 @@ type Store interface {
 	ReadAll(last []byte, limit int) *GlobalSlice
 	ReadAllFromAggregate(aggregId string) []AggregateEvent
 	Clear()
-	ReportMetrics()
 	AppendToAggregate(aggregId string, expectedVersion int, records []Envelope) (err error)
 	Append(records []Envelope) (err error)
 }

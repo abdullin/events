@@ -5,7 +5,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"code.google.com/p/go-uuid/uuid"
+	"github.com/pborman/uuid"
+	"github.com/abdullin/fdb-go/fdb"
 )
 
 var (
@@ -65,6 +66,10 @@ func (u UUID) Node() uint32 {
 }
 func (u UUID) Sequence() uint32 {
 	return binary.BigEndian.Uint32([]byte(u)[8:])
+}
+func (u UUID) FDBKey() fdb.Key{
+	return []byte(u)
+
 }
 
 func (u UUID) After(another UUID) bool {

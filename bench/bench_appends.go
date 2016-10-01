@@ -6,15 +6,14 @@ import (
 	"sync"
 	"time"
 
-	"github.com/happypancake/events"
+	"github.com/abdullin/events"
 )
 
 func benchmarkAppends(records, goroutines, size int) {
 
-	log.Info("Benchmark appends with %v goroutines and %v records (each)", goroutines, records)
+	log.Infof("Benchmark appends with %v goroutines and %v records (each)", goroutines, records)
 
 	es := events.NewFdbStore(db, "bench")
-	es.ReportMetrics()
 	defer es.Clear()
 
 	var wg sync.WaitGroup
@@ -31,7 +30,7 @@ func benchmarkAppends(records, goroutines, size int) {
 		go func() {
 			defer wg.Done()
 			for i := 0; i < records; i++ {
-				es.Append(
+				es.AppendToAggregate(
 					aggName,
 					events.ExpectedVersionAny,
 					pack,
@@ -44,7 +43,7 @@ func benchmarkAppends(records, goroutines, size int) {
 
 	speed := (float64(size*records*goroutines) / time.Now().Sub(started).Seconds()) / (1024 * 1024)
 
-	log.Info("Writing %v records in %v threads in %v at speed of %.1f MB/s",
+	log.Infof("Writing %v records in %v threads in %v at speed of %.1f MB/s",
 		records,
 		goroutines,
 		time.Now().Sub(started),
@@ -53,7 +52,6 @@ func benchmarkAppends(records, goroutines, size int) {
 
 func benchmarkReadWrite(records, byteSize, pageSize int) {
 	es := events.NewFdbStore(db, "bench")
-	es.ReportMetrics()
 	defer es.Clear()
 
 	data := bytes.Repeat([]byte("Z"), byteSize)
@@ -64,7 +62,7 @@ func benchmarkReadWrite(records, byteSize, pageSize int) {
 	}
 
 	for i := 0; i < (records / pageSize); i++ {
-		es.Append("test", events.ExpectedVersionAny, page)
+		es.AppendToAggregate("test", events.ExpectedVersionAny, page)
 	}
 
 	var (
@@ -76,7 +74,7 @@ func benchmarkReadWrite(records, byteSize, pageSize int) {
 	elapsed = time.Now().Sub(start)
 
 	speed := (float64(byteSize*records) / elapsed.Seconds()) / (1024 * 1024)
-	log.Info("Aggregate : Read %v records in %v at %.1f MB/s", len(agg), elapsed, speed)
+	log.Infof("Aggregate : Read %v records in %v at %.1f MB/s", len(agg), elapsed, speed)
 
 	start = time.Now()
 
@@ -103,5 +101,5 @@ func benchmarkReadWrite(records, byteSize, pageSize int) {
 	elapsed = time.Now().Sub(start)
 
 	speed = (float64(readFromGlobalBytes) / elapsed.Seconds()) / (1024 * 1024)
-	log.Info("Aggregate : Read %v records in %v at %.1f MB/s", readFromGlobalRecords, elapsed, speed)
+	log.Infof("Aggregate : Read %v records in %v at %.1f MB/s", readFromGlobalRecords, elapsed, speed)
 }

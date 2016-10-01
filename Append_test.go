@@ -1,7 +1,7 @@
 package events
 
 import (
-	"github.com/FoundationDB/fdb-go/fdb"
+	"github.com/abdullin/fdb-go/fdb"
 	. "gopkg.in/check.v1"
 )
 
